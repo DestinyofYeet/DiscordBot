@@ -1,0 +1,10 @@
+data/
+.idea/
+out/
+target/
+
+src/main/java/dm/
+src/main/resources/
+src/main/java/main/DmCommandManager.java
+
+apex_legends_api_token.txt

@@ -7,7 +7,7 @@ import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import utils.*;
-import utils.sql.Request;
+import utils.sql.SQLRequest;
 import utils.sql.RequestType;
 
 import java.awt.*;
@@ -64,7 +64,7 @@ public class LoggingChannel extends CommandManager {
         }
 
         if (sql != null){
-            Main.getRequestManager().queue(new Request(RequestType.EXECUTE, sql, data));
+            Main.getRequestManager().queue(new SQLRequest(RequestType.EXECUTE, sql, data));
         }
     }
 }

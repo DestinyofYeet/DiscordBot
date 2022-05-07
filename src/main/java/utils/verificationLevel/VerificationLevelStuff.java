@@ -1,10 +1,7 @@
 package utils.verificationLevel;
 
-import commands.VerificationLevelCommand;
-import io.opencensus.trace.Link;
 import main.Main;
-import net.dv8tion.jda.api.entities.Category;
-import utils.sql.Request;
+import utils.sql.SQLRequest;
 import utils.sql.RequestType;
 import utils.sql.SQLRequestManager;
 
@@ -29,11 +26,11 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        Map<String, String> result = request.getResult();
+        Map<String, String> result = SQLRequest.getResult();
 
         if (result == null) return null;
 
@@ -50,11 +47,11 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        Map<String, String> result = request.getResult();
+        Map<String, String> result = SQLRequest.getResult();
 
         return !result.isEmpty();
     }
@@ -83,9 +80,9 @@ public class VerificationLevelStuff {
             }};
         }
 
-        Request request = new Request(RequestType.EXECUTE, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
     }
 
     public static void setVerificationCategory(String guildId, String categoryId){
@@ -102,9 +99,9 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.EXECUTE, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
     }
 
     public static String getVerificationCategory(String guildId){
@@ -120,13 +117,13 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        if (request.getResult() == null || request.getResult().isEmpty()) return null;
+        if (SQLRequest.getResult() == null || SQLRequest.getResult().isEmpty()) return null;
 
-        return request.getResult().get("verification_category_id");
+        return SQLRequest.getResult().get("verification_category_id");
     }
 
     public static String getVerificationRoleId(String guildId){
@@ -142,13 +139,13 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        if (request.getResult() == null || request.getResult().isEmpty()) return null;
+        if (SQLRequest.getResult() == null || SQLRequest.getResult().isEmpty()) return null;
 
-        return request.getResult().get("verification_role_id");
+        return SQLRequest.getResult().get("verification_role_id");
     }
 
     public static void setVerificationRoleId(String guildId, String roleId){
@@ -165,9 +162,9 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.EXECUTE, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
     }
 
     public static void setWasLockedBefore(String guildId, LinkedList<String> list){
@@ -184,9 +181,9 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.EXECUTE, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
     }
 
     public static LinkedList<String> getWasLockedBefore(String guildId){
@@ -202,11 +199,11 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        String result = request.getResult().get("was_locked_before");
+        String result = SQLRequest.getResult().get("was_locked_before");
 
         return new LinkedList<>(List.of(result.replace("[", "").replace("]", "").split(", ")));
     }
@@ -225,9 +222,9 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.EXECUTE, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
     }
 
     public static String getVerificationText(String guildId){
@@ -243,10 +240,10 @@ public class VerificationLevelStuff {
             add(guildId);
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, args);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, args);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        return request.getResult().get("verification_text");
+        return SQLRequest.getResult().get("verification_text");
     }
 }

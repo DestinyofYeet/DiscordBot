@@ -1,14 +1,14 @@
 package utils.stuffs;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import main.Main;
 import utils.Constants;
+import utils.sql.RequestType;
+import utils.sql.SQLRequest;
+import utils.sql.SQLRequestManager;
 
-import java.io.File;
-import java.io.IOException;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.lang.reflect.Array;
+import java.util.ArrayList;
+import java.util.List;
 
 public class PrefixStuff {
 
@@ -16,31 +16,47 @@ public class PrefixStuff {
 
     public static String getPrefix(long id){
 
-        File file = new File(Constants.getPrefixPath());
+        String sqlSyntax = "select prefix from serverPrefixes where serverId=?";
+        ArrayList<String> vars = new ArrayList<>(){{
+            add(String.valueOf(id));
+        }};
 
-        try {
-            String content = new String(Files.readAllBytes(Paths.get(file.toURI())), StandardCharsets.UTF_8);
-            JSONObject json = new JSONObject(content);
+        SQLRequest request = new SQLRequest(RequestType.RESULT, sqlSyntax, vars);
 
-            if (json.get(String.valueOf(id)) instanceof String){
-                String prefix = (String) json.get(String.valueOf(id));
-                return prefix;
+        Main.getRequestManager().queue(request);
 
-            }
+        if (request.getResult().isEmpty()) return "!"; // no prefix was set
 
-
-        } catch (IOException e){
-            e.printStackTrace();
-
-        } catch (JSONException e){
-            setPrefix(id, "!");
-            return "!";
-        }
-
-        return "!";
+        return request.getResult().get("prefix");
     }
 
     public static void setPrefix(long id, String newPrefix){
-        JsonStuff.writeToJsonFile(Constants.getPrefixPath(), String.valueOf(id), newPrefix);
+        String sqlSyntax = "select prefix from serverPrefixes where serverId=?";
+        ArrayList<String> vars = new ArrayList<>(){{
+            add(String.valueOf(id));
+        }};
+
+        SQLRequest request = new SQLRequest(RequestType.RESULT, sqlSyntax, vars);
+
+        Main.getRequestManager().queue(request);
+
+        if (request.getResult().isEmpty()) {
+            sqlSyntax= "insert into serverPrefixes(serverId, prefix) values (?, ?)";
+            vars = new ArrayList<>(){{
+               add(String.valueOf(id));
+               add(newPrefix);
+            }};
+
+        } else {
+            sqlSyntax = "update serverPrefixes set prefix=? where serverId=?";
+            vars = new ArrayList<>(){{
+                add(newPrefix);
+                add(String.valueOf(id));
+            }};
+        }
+
+        request = new SQLRequest(RequestType.EXECUTE, sqlSyntax, vars);
+
+        Main.getRequestManager().queue(request);
     }
 }

@@ -1,16 +1,12 @@
 package commands;
 
 import main.CommandManager;
-import main.Main;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import utils.*;
-import utils.sql.Request;
-import utils.sql.RequestType;
 
 import java.awt.Color;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Setup extends CommandManager {

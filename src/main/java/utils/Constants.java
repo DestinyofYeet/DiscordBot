@@ -5,7 +5,7 @@ import net.dv8tion.jda.api.entities.*;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.RestAction;
 import org.apache.commons.io.IOUtils;
-import utils.sql.Request;
+import utils.sql.SQLRequest;
 import utils.sql.RequestType;
 import utils.sql.SQLRequestManager;
 
@@ -16,7 +16,6 @@ import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -122,13 +121,13 @@ public class Constants {
             add(guild.getId());
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, data);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, data);
 
-        requestManager.queue(request);
+        requestManager.queue(SQLRequest);
 
-        if (request.getResult().isEmpty()) return null;
+        if (SQLRequest.getResult().isEmpty()) return null;
 
-        return guild.getTextChannelById(request.getResult().get("channelID"));
+        return guild.getTextChannelById(SQLRequest.getResult().get("channelID"));
     }
 
     public static void setLoggingChannel(Guild guild, String channelID){
@@ -139,25 +138,25 @@ public class Constants {
             add(guild.getId());
         }};
 
-        Request request = new Request(RequestType.RESULT, sql, data);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, data);
 
-        requestManager.queue(request);
+        requestManager.queue(SQLRequest);
 
-        if (!request.getResult().isEmpty()){
+        if (!SQLRequest.getResult().isEmpty()){
             sql = "delete from loggingChannels where guildID=?";
             ArrayList<String> data1 = new ArrayList<>(){{
                 add(guild.getId());
             }};
-            request = new Request(RequestType.EXECUTE, sql, data1);
-            requestManager.queue(request);
+            SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, data1);
+            requestManager.queue(SQLRequest);
         }
 
         sql = "insert into loggingChannels (guildID, channelID) values (?, ?)";
         data.add(channelID);
 
-        request = new Request(RequestType.EXECUTE, sql, data);
+        SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, data);
 
-        requestManager.queue(request);
+        requestManager.queue(SQLRequest);
     }
 
     public static Member getMemberById(Guild guild, String id) {

@@ -4,12 +4,11 @@ import main.CommandManager;
 import main.Main;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import utils.*;
-import utils.sql.Request;
+import utils.sql.SQLRequest;
 import utils.sql.RequestType;
 import utils.sql.SQLRequestManager;
 
 import java.awt.Color;
-import java.io.File;
 import java.util.List;
 
 public class MessageCache extends CommandManager {
@@ -26,11 +25,11 @@ public class MessageCache extends CommandManager {
 
         String sql = "select TABLE_NAME as 'Table', (DATA_LENGTH + INDEX_LENGTH) as 'Size' from information_schema.TABLES where TABLE_SCHEMA='kermitBotData' and TABLE_NAME='messageCache'";
 
-        Request request = new Request(RequestType.RESULT, sql, null);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, null);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        long fileSizeBytes = Long.parseLong(request.getResult().get("Size"));
+        long fileSizeBytes = Long.parseLong(SQLRequest.getResult().get("Size"));
 
         long kiloBytes = 0;
         while (fileSizeBytes > 1000) {
@@ -50,11 +49,11 @@ public class MessageCache extends CommandManager {
 
         sql = "select count(*) from messageCache";
 
-        request = new Request(RequestType.RESULT, sql, null);
+        SQLRequest = new SQLRequest(RequestType.RESULT, sql, null);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        int numberOfMessagesCached = Integer.parseInt(request.getResult().get("count(*)"));
+        int numberOfMessagesCached = Integer.parseInt(SQLRequest.getResult().get("count(*)"));
 
         String fileSize = null;
 
@@ -82,9 +81,9 @@ public class MessageCache extends CommandManager {
 
             sql = "delete from messageCache";
 
-            request = new Request(RequestType.EXECUTE, sql, null);
+            SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, null);
 
-            manager.queue(request);
+            manager.queue(SQLRequest);
 
             event.getChannel().sendMessageEmbeds(new Embed("Cleared message cache successfully", "Successfully cleared internal messaged cache\n\nAmount of messages cleared: " + numberOfMessagesCached, Color.GREEN).build()).queue();
         }

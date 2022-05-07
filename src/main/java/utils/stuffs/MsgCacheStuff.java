@@ -3,10 +3,9 @@ package utils.stuffs;
 import main.Main;
 import net.dv8tion.jda.api.JDA;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import org.json.JSONObject;
 import utils.CachedMessage;
 import utils.Logger;
-import utils.sql.Request;
+import utils.sql.SQLRequest;
 import utils.sql.RequestType;
 import utils.sql.SQLRequestManager;
 
@@ -32,9 +31,9 @@ public class MsgCacheStuff {
             add(event.getMessage().getContentRaw());
         }};
 
-        Request request = new Request(RequestType.EXECUTE, sql, data);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.EXECUTE, sql, data);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
     }
 
     public static CachedMessage readFromCache(JDA jda, String messageId){
@@ -43,13 +42,13 @@ public class MsgCacheStuff {
         String sql = "select * from messageCache where messageID=?";
         ArrayList<String> data = new ArrayList<>() {{add(messageId);}};
 
-        Request request = new Request(RequestType.RESULT, sql, data);
+        SQLRequest SQLRequest = new SQLRequest(RequestType.RESULT, sql, data);
 
-        manager.queue(request);
+        manager.queue(SQLRequest);
 
-        if (request.getResult().isEmpty()) return null;
+        if (SQLRequest.getResult().isEmpty()) return null;
 
 
-        return new CachedMessage(request.getResult(), jda);
+        return new CachedMessage(SQLRequest.getResult(), jda);
     }
 }

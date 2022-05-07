@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-public class Request {
+public class SQLRequest {
     private RequestType type;
 
     private String sql;
@@ -14,17 +14,17 @@ public class Request {
 
     private Object lock;
 
-    private Request overwriteRequest;
+    private SQLRequest overwriteSQLRequest;
 
-    private Request(){
+    private SQLRequest(){
         this.lock = new Object();
 
         this.result = new HashMap<>();
 
-        this.overwriteRequest = null;
+        this.overwriteSQLRequest = null;
     }
 
-    public Request(RequestType type, String sql, ArrayList<String> data){
+    public SQLRequest(RequestType type, String sql, ArrayList<String> data){
         this();
 
         this.type = type;
@@ -32,10 +32,10 @@ public class Request {
         this.data = data == null ? new ArrayList<>() : data;
     }
 
-    public Request(RequestType type, String sql, ArrayList<String> data, Request overwriteRequest){
+    public SQLRequest(RequestType type, String sql, ArrayList<String> data, SQLRequest overwriteSQLRequest){
         this(type, sql, data);
 
-        this.overwriteRequest = overwriteRequest;
+        this.overwriteSQLRequest = overwriteSQLRequest;
     }
 
     public RequestType getType() {
@@ -62,7 +62,7 @@ public class Request {
         return lock;
     }
 
-    public Request getOverwriteRequest() {
-        return overwriteRequest;
+    public SQLRequest getOverwriteRequest() {
+        return overwriteSQLRequest;
     }
 }

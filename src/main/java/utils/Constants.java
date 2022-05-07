@@ -74,15 +74,6 @@ public class Constants {
         return "data/inviteWhitelist.json";
     }
 
-    public static String getPrefixPath() {
-        return "data/prefix.json";
-    }
-
-    public static String getChannelConfigurationPath() {
-        return "data/channels.json";
-    }
-
-
 
     public static String getConfigPath() {
         return "data/config.json";

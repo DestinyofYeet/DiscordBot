@@ -69,7 +69,6 @@ public class Recognize extends CommandManager {
 
 
         Process process;
-        Runtime runtime = Runtime.getRuntime();
 
         String videoFileSyntax = "data/" + event.getGuild().getId() + "_" + event.getMember().getId() + ".%(ext)s";
 

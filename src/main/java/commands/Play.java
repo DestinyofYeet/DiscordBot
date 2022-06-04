@@ -62,6 +62,9 @@ public class Play extends CommandManager {
         }
 
 
+//        System.out.println("Play: Args.get(0)=" + args.get(0));
+
+
 
         if (Constants.isUrl(argsList.get(0))){
             boolean canSeek = false;
@@ -101,6 +104,7 @@ public class Play extends CommandManager {
             return;
         }
 
+//        System.out.println("Play: Searching on yt");
 
         // if the input is not a URL, it joins all arguments to a string and and searches per Youtube-API for it
         String input = String.join(" ", argsList);

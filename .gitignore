@@ -8,3 +8,4 @@ src/main/resources/
 src/main/java/main/DmCommandManager.java
 
 apex_legends_api_token.txt
+example_data.json

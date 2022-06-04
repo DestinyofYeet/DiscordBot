@@ -4,7 +4,7 @@ import okhttp3.Response;
 import org.json.JSONObject;
 import utils.Logger;
 import utils.gamestats.apexlegends.generics.BaseApexRequest;
-import utils.gamestats.apexlegends.generics.ApexPlayer;
+import utils.gamestats.apexlegends.generics.statistics.ApexPlayer;
 
 import java.io.IOException;
 
@@ -37,8 +37,19 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
             throw new RuntimeException(e);
         }
 
-        System.out.println(data.toString(2));
+       if (data.has("Error")){
+           String errorMsg = data.getString("Error");
+
+           if (errorMsg.contains("not found")){
+               this.apexPlayer = null;
+               return;
+           }
+       }
 
         this.apexPlayer = new ApexPlayer(data);
+    }
+
+    public ApexPlayer getApexPlayer() {
+        return apexPlayer;
     }
 }

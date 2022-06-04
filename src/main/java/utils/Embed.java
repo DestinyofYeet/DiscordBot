@@ -4,8 +4,11 @@ import net.dv8tion.jda.api.EmbedBuilder;
 import net.dv8tion.jda.api.entities.MessageEmbed;
 
 import java.awt.Color;
+import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
+import java.util.Date;
 
 public class Embed {
     // improved embed builder (embed builder v 2)
@@ -17,7 +20,7 @@ public class Embed {
             builder = new EmbedBuilder();
             builder.addField(title, message, false);
             builder.setColor(color);
-            builder.setFooter(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss")));
+            builder.setTimestamp(Instant.now());
 
         } catch (IllegalArgumentException noted){
             builder = null;
@@ -31,12 +34,29 @@ public class Embed {
             EmbedBuilder builder = new EmbedBuilder();
             builder.addField(title, message, false);
             builder.setColor(color);
-            builder.setFooter(LocalDateTime.now().format(DateTimeFormatter.ofPattern("dd.MM.yyyy, HH:mm:ss")) + " | " + additionalFooter);
+            builder.setFooter(additionalFooter);
+            builder.setTimestamp(Instant.now());
 
         } catch (IllegalArgumentException noted){
             builder = null;
+            throw noted;
         }
 
+    }
+
+    public Embed setImage(String url){
+        builder.setImage(url);
+        return this;
+    }
+
+    public Embed setAuthor(String text, String url){
+        builder.setAuthor(text, null, url);
+        return this;
+    }
+
+    public Embed setThumbnail(String url){
+        builder.setThumbnail(url);
+        return this;
     }
 
     public Embed addField(String title, String message, boolean inline){

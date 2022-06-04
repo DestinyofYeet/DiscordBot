@@ -43,32 +43,27 @@ public class Help extends CommandManager {
         event.getChannel().sendMessageEmbeds(new Embed(commandName, "Syntax:```\n" + syntax + "```\n" + description, Color.WHITE).build()).queue();
     }
 
+    private void getHelpInfoAndAddToList(String className, LinkedList<String> whichListToAdd){
+        try {
+            Class c = Class.forName("commands." + className);
+
+            Field commandNameField = c.getDeclaredField("commandName");
+            Field syntaxField = c.getDeclaredField("syntax");
+            whichListToAdd.add("**" + commandNameField.get("") + ":** `" + syntaxField.get("") + "`" + "\n");
+
+        } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
+            e.printStackTrace();
+        }
+    }
+
     public Help(){
         if (MODERATION_COMMANDS.isEmpty()){
             for (String className: MODERATION_COMMANDS_RAW){
-                try {
-                    Class c = Class.forName("commands." + className);
-
-                    Field commandNameField = c.getDeclaredField("commandName");
-                    Field syntaxField = c.getDeclaredField("syntax");
-                    MODERATION_COMMANDS.add("**" + commandNameField.get("") + ":** `" + syntaxField.get("") + "`" + "\n");
-
-                } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                getHelpInfoAndAddToList(className, MODERATION_COMMANDS);
             }
 
             for (String className: MUSIC_COMMANDS_RAW){
-                try {
-                    Class c = Class.forName("commands." + className);
-
-                    Field commandNameField = c.getDeclaredField("commandName");
-                    Field syntaxField = c.getDeclaredField("syntax");
-                    MUSIC_COMMANDS.add("**" + commandNameField.get("") + ":** `" + syntaxField.get("") + "`" + "\n");
-
-                } catch (ClassNotFoundException | NoSuchFieldException | IllegalAccessException e) {
-                    e.printStackTrace();
-                }
+                getHelpInfoAndAddToList(className, MUSIC_COMMANDS);
             }
         }
 

@@ -44,12 +44,8 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
         }
 
        if (data.has("Error")){
-           String errorMsg = data.getString("Error");
-
-           if (errorMsg.contains("not found")){
-               this.apexPlayer = null;
-               return;
-           }
+           this.apexPlayer = null;
+           return;
        }
 
         this.apexPlayer = new ApexPlayer(data);

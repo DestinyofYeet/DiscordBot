@@ -9,7 +9,7 @@ public class Badge {
     private final int value;
 
     public Badge(JSONObject badgeInfo){
-        name = badgeInfo.getString("name");
+        name = badgeInfo.optString("name", null);
         category = badgeInfo.getString("category");
         value = badgeInfo.getInt("value");
     }

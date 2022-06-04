@@ -50,7 +50,16 @@ public class ApexStats {
         ApexPlayer player = statsRequest.getApexPlayer();
 
         if (player == null){
-            event.getChannel().sendMessageEmbeds(new Embed("Error", "Player " + playerName + " not found!", Color.RED).build()).queue();
+
+            switch (statsRequest.getResponse().code()) {
+                case 404 ->
+                        event.getChannel().sendMessageEmbeds(new Embed("Error", "Player " + playerName + " not found!", Color.RED).build()).queue();
+                case 410 ->
+                        event.getChannel().sendMessageEmbeds(new Embed("Error", "Invalid platform provided!", Color.RED).build()).queue();
+                default ->
+                        event.getChannel().sendMessageEmbeds(new Embed("Error", "An Unknown error occured while looking up player " + playerName + "!\nCode: " + statsRequest.getResponse().code() + "\nMessage: " + statsRequest.getResponse().message(), Color.RED).build()).queue();
+            }
+
             return;
         }
 

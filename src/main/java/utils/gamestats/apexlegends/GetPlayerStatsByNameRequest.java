@@ -10,6 +10,10 @@ import java.io.IOException;
 
 public class GetPlayerStatsByNameRequest extends BaseApexRequest {
     private ApexPlayer apexPlayer;
+    
+    private String playerName;
+
+    private Response response;
 
     private final static Logger logger = new Logger("GetPlayerStatsByNameRequest");
 
@@ -17,6 +21,7 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
     public GetPlayerStatsByNameRequest(String playerName, String platform) {
         super();
         apexPlayer = null;
+        this.playerName = playerName;
         String route = "/bridge?player=" + playerName + "&platform=" + platform;
 
         this.setRoute(route);
@@ -25,7 +30,8 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
     @Override
     public void onSuccess(Response response){
         if (!response.isSuccessful()){
-            logger.error("Request is not successfull! Code: " + response.code());
+            logger.error("Request is not successful! Code: " + response.code());
+            this.response = response;
             return;
         }
 
@@ -51,5 +57,9 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
 
     public ApexPlayer getApexPlayer() {
         return apexPlayer;
+    }
+
+    public Response getResponse() {
+        return response;
     }
 }

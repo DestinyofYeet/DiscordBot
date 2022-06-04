@@ -50,6 +50,8 @@ public abstract class Request {
         Response response = client.newCall(request).execute();
 
         onSuccess(response);
+
+        response.close();
     }
 
     public void onSuccess(Response response){

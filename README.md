@@ -1,4 +1,4 @@
-Discord bot lol
+Discord bot
 
 Basically just a code-dump since the config files are missing.
 

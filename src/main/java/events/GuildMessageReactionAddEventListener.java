@@ -20,7 +20,7 @@ public class GuildMessageReactionAddEventListener extends ListenerAdapter {
         String messageId = event.getMessageId();
         String emojiId;
         try {
-            emojiId = event.getReactionEmote().getId();
+            emojiId = event.getEmoji().asCustom().getId();
         } catch (IllegalStateException ignored){
             return;
         }

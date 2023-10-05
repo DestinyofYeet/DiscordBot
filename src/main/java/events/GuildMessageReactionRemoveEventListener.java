@@ -1,6 +1,7 @@
 package events;
 
 import net.dv8tion.jda.api.entities.Role;
+import net.dv8tion.jda.api.entities.UserSnowflake;
 import net.dv8tion.jda.api.events.message.react.MessageReactionRemoveEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import org.json.JSONObject;
@@ -28,14 +29,14 @@ public class GuildMessageReactionRemoveEventListener extends ListenerAdapter {
         if (innerJsonString == null) return;
 
         JSONObject innerJson = new JSONObject(innerJsonString);
-        String emojiId = event.getReactionEmote().getId();
+        String emojiId = event.getEmoji().asCustom().getId();
         String roleId = innerJson.getString(emojiId);
         if (roleId == null) return;
 
         Role role = event.getGuild().getRoleById(roleId);
         if (role == null) return;
 
-        event.getGuild().removeRoleFromMember(event.getUserId(), role).queue();
+        event.getGuild().removeRoleFromMember(UserSnowflake.fromId(event.getUserId()), role).queue();
 
     }
 }

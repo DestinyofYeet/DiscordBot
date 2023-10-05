@@ -3,7 +3,8 @@ package commands;
 import main.CommandManager;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.UserSnowflake;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -36,7 +37,7 @@ public class Unban extends CommandManager {
         RestAction<Guild.Ban> banData;
 
         try{
-            banData = event.getGuild().retrieveBanById(args.get(0));
+            banData = event.getGuild().retrieveBan(UserSnowflake.fromId(args.get(0)));
         } catch (IllegalArgumentException e){
             event.getChannel().sendMessageEmbeds(new Embed("Error", "Invalid input. You need to provide a discord user id!", Color.RED).build()).queue();
             return;

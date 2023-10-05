@@ -2,10 +2,10 @@ package commands;
 
 import main.CommandManager;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Emote;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.requests.RestAction;
@@ -59,10 +59,10 @@ public class RoleReact extends CommandManager {
         String roleId = argsList.get(3);
 
 
-        Emote emote = Constants.getEmote(event.getGuild(), emoteInput);
+        Emoji emoji = Constants.getEmoji(event.getGuild(), emoteInput);
 
-        if (emote == null){
-            event.getChannel().sendMessageEmbeds(new Embed("Error", "That emote doesn't exist on this server!", Color.RED).build()).queue();
+        if (emoji == null){
+            event.getChannel().sendMessageEmbeds(new Embed("Error", "That emoji doesn't exist on this server!", Color.RED).build()).queue();
             return;
         }
 
@@ -105,7 +105,7 @@ public class RoleReact extends CommandManager {
         if (fileContent != null) {
             JSONObject outerJson = new JSONObject(fileContent);
             JSONObject innerJson = new JSONObject();
-            innerJson.put(emote.getId(), role.getId());
+            innerJson.put(emoji.getAsReactionCode(), role.getId());
             JSONObject innerJsonFromOuterJson = null;
             try {
                 innerJsonFromOuterJson = new JSONObject(outerJson.getString(messageId));
@@ -124,14 +124,14 @@ public class RoleReact extends CommandManager {
         } else {
             JSONObject innerJson = new JSONObject();
             JSONObject outerJson = new JSONObject();
-            innerJson.put(emote.getId(), role.getId());
+            innerJson.put(emoji.getAsReactionCode(), role.getId());
             outerJson.put(messageId, innerJson.toString());
 
             JsonStuff.writeToJsonFile(Constants.getReactionPath(), event.getGuild().getId(), outerJson.toString());
         }
 
 
-        message.addReaction(emote).queue();
+        message.addReaction(emoji).queue();
         event.getChannel().sendMessageEmbeds(new Embed("Reacted", "Reaction added!\n\n[Click to jump to url](" + message.getJumpUrl() + ")", Color.GREEN).build()).queue();
     }
 }

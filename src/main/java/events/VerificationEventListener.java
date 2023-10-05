@@ -1,7 +1,7 @@
 package events;
 
 import net.dv8tion.jda.api.entities.Role;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.react.MessageReactionAddEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
@@ -24,7 +24,7 @@ public class VerificationEventListener extends ListenerAdapter {
 
         for (ReactionVerification reactionVerification: reactionVerificationList){
             if (reactionVerification.getMessageId().equals(event.getMessageId()) && reactionVerification.getUserId().equals(event.getUserId())
-            && reactionVerification.getReactionId().equals(event.getReaction().getReactionEmote().getAsReactionCode())){
+            && reactionVerification.getReactionId().equals(event.getReaction().getEmoji().getAsReactionCode())){
                 Role verificationRole = event.getGuild().getRoleById(VerificationLevelStuff.getVerificationRoleId(event.getGuild().getId()));
 
                 event.getGuild().addRoleToMember(event.getMember(), verificationRole).queue();

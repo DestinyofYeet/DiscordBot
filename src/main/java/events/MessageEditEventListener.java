@@ -1,6 +1,6 @@
 package events;
 
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.events.message.MessageUpdateEvent;
@@ -27,7 +27,7 @@ public class MessageEditEventListener extends ListenerAdapter {
         CachedMessage cachedMessage = MsgCacheStuff.readFromCache(event.getJDA(), event.getMessageId());
         String string = null;
         if (cachedMessage == null){
-            string = "A message from got edited in " + event.getTextChannel().getAsMention() + ":\n\n**Message:**\n" + "```" + message.getContentRaw() + "```" + "\n\nThe bot doesn't have the original message chached, that's why you only see the edited one!";
+            string = "A message from got edited in " + event.getChannel().getAsMention() + ":\n\n**Message:**\n" + "```" + message.getContentRaw() + "```" + "\n\nThe bot doesn't have the original message chached, that's why you only see the edited one!";
 
         } else {
             String cachedMessageContent = cachedMessage.getContent();
@@ -37,7 +37,7 @@ public class MessageEditEventListener extends ListenerAdapter {
                 if (message.getContentRaw().length() == 0) return;
                 if (message.getContentRaw().equals(cachedMessageContent)) return;
                 if (cachedMessageContent.length() == 0) return;
-                string = "A message from " + member.getAsMention() + " got edited in " + event.getTextChannel().getAsMention() + ":\n\n**Before:**\n" + "```" + cachedMessageContent + "```" + "\n\n**After:**\n" + "```"  + message.getContentRaw()+ "```";
+                string = "A message from " + member.getAsMention() + " got edited in " + event.getChannel().getAsMention() + ":\n\n**Before:**\n" + "```" + cachedMessageContent + "```" + "\n\n**After:**\n" + "```"  + message.getContentRaw()+ "```";
             }
         }
 

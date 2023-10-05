@@ -3,6 +3,7 @@ package utils.gamestats.apexlegends;
 import okhttp3.Response;
 import org.json.JSONObject;
 import utils.Logger;
+import utils.api.generics.ResponseWrapper;
 import utils.gamestats.apexlegends.generics.BaseApexRequest;
 import utils.gamestats.apexlegends.generics.statistics.ApexPlayer;
 
@@ -13,7 +14,7 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
     
     private String playerName;
 
-    private Response response;
+    private ResponseWrapper response;
 
     private final static Logger logger = new Logger("GetPlayerStatsByNameRequest");
 
@@ -28,22 +29,18 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
     }
 
     @Override
-    public void onSuccess(Response response){
+    public void onResponse(ResponseWrapper response){
         if (!response.isSuccessful()){
-            logger.error("Request is not successful! Code: " + response.code());
+            logger.error("Request is not successful! Code: " + response.getCode());
             this.response = response;
             return;
         }
 
         JSONObject data;
 
-        try {
-            data = new JSONObject(response.body().string());
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
+        data = response.getJsonBody();
 
-       if (data.has("Error")){
+        if (data.has("Error")){
            this.apexPlayer = null;
            return;
        }
@@ -55,7 +52,7 @@ public class GetPlayerStatsByNameRequest extends BaseApexRequest {
         return apexPlayer;
     }
 
-    public Response getResponse() {
+    public ResponseWrapper getResponse() {
         return response;
     }
 }

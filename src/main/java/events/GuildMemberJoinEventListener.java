@@ -2,13 +2,14 @@ package events;
 
 import main.Main;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Category;
-import net.dv8tion.jda.api.entities.MessageChannel;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.guild.member.GuildMemberJoinEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import net.dv8tion.jda.api.requests.ErrorResponse;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.json.JSONObject;
 import utils.Constants;
 import utils.Embed;
@@ -24,6 +25,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.EnumSet;
 import java.util.concurrent.TimeUnit;
 
 public class GuildMemberJoinEventListener extends ListenerAdapter {
@@ -63,16 +65,15 @@ public class GuildMemberJoinEventListener extends ListenerAdapter {
 
         TextChannel currentUserChannel = verificationCategory.createTextChannel(event.getMember().getEffectiveName() + "#" + event.getMember().getUser().getDiscriminator()).complete();
 
-        currentUserChannel.putPermissionOverride(event.getGuild().getPublicRole())
-                .setDeny(Permission.VIEW_CHANNEL).queue();
+        currentUserChannel.getManager().putPermissionOverride(event.getGuild().getPublicRole(), null, EnumSet.of(Permission.VIEW_CHANNEL)).queue();
 
-        currentUserChannel.putPermissionOverride(event.getMember())
-                .setAllow(Permission.VIEW_CHANNEL).queue();
+
+        currentUserChannel.getManager().putPermissionOverride(event.getMember(), EnumSet.of(Permission.VIEW_CHANNEL), null).queue();
 
         if (verificationLevel.getLevel() == 1){
             currentUserChannel.sendMessage(event.getMember().getAsMention() + "\n" + VerificationLevelStuff.getVerificationText(event.getGuild().getId())).queue(message -> {
                 Main.getVerificationEventListener().reactionVerificationList.add(new ReactionVerification(event.getMember().getId(), message.getId(), currentUserChannel.getId(), "✅"));
-                message.addReaction("✅").queue();
+                message.addReaction(Emoji.fromFormatted("✅")).queue();
             });
 
         } else if (verificationLevel.getLevel() == 2){
@@ -93,7 +94,7 @@ public class GuildMemberJoinEventListener extends ListenerAdapter {
             Main.getCaptchaSolveEventListener().captchaList.add(new CaptchaVerification(event.getMember().getId(), currentUserChannel.getId(), json.getString("key")));
 
             currentUserChannel.sendMessageEmbeds(new Embed("Captcha required!", "Please solve this captcha to get access to the server!", Color.BLACK).build()).queue();
-            currentUserChannel.sendFile(new File(json.getString("path")), "captcha.png").queue();
+            currentUserChannel.sendFiles(FileUpload.fromData(new File(json.getString("path")), "captcha.png")).queue();
 
             logger.info((new File(json.getString("path")).delete() ? "Successfully deleted" : "Failed to delete") + " captcha image!");
         }

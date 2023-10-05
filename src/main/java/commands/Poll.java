@@ -2,8 +2,8 @@ package commands;
 
 import main.CommandManager;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.Emote;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import utils.Args;
 import utils.Constants;
@@ -64,17 +64,17 @@ public class Poll extends CommandManager {
         List<String> stringEmotes = new ArrayList<>();
 
 
-        List<Emote> emotesToReact = new ArrayList<Emote>(){{
+        List<Emoji> emotesToReact = new ArrayList<Emoji>(){{
            for (String emoteString: reactionEmotes){
                if (emoteString.length() < 6){stringEmotes.add(emoteString); continue;}
-               Emote emote = Constants.getEmote(event.getGuild(), emoteString);
-               if (emote != null) add(emote);
+               Emoji emoji = Constants.getEmoji(event.getGuild(), emoteString);
+               if (emoji != null) add(emoji);
            }
         }};
         event.getChannel().sendMessageEmbeds(new Embed("Poll", "Poll sent in " + targetChannel.getAsMention() + "!", Color.GREEN).build()).queue();
         targetChannel.sendMessageEmbeds(new Embed("Poll: " + topic, description, Color.GREEN).build()).queue(m -> {
-            for (Emote emote: emotesToReact) m.addReaction(emote).queue();
-            for (String stringEmoteString: stringEmotes) m.addReaction(stringEmoteString).queue();
+            for (Emoji emoji: emotesToReact) m.addReaction(emoji).queue();
+            for (String stringEmoteString: stringEmotes) m.addReaction(Emoji.fromFormatted(stringEmoteString)).queue();
         });
 
     }

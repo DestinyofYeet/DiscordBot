@@ -2,8 +2,9 @@ package utils.paginator;
 
 import events.PaginatorEventListener;
 import net.dv8tion.jda.api.entities.Message;
-import net.dv8tion.jda.api.entities.MessageChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.User;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import utils.Embed;
@@ -121,7 +122,7 @@ public class GenericPaginator {
 
     public void applyReactions(){
         for (PaginatorReaction reaction: reactions){
-            paginatorMessage.addReaction(reaction.getEmojiString()).queue();
+            paginatorMessage.addReaction(Emoji.fromFormatted(reaction.getEmojiString())).queue();
         }
     }
 
@@ -133,7 +134,7 @@ public class GenericPaginator {
         reactions.add(new PaginatorReaction("⏪", ((user, emote, paginator, message) -> {
             if (!user.getId().equals(userRequestedThis.getId())) return;
 
-            message.removeReaction(emote, user).queue();
+            message.removeReaction(Emoji.fromFormatted(emote), user).queue();
 
             paginator.setCurrentPage(1);
 
@@ -143,7 +144,7 @@ public class GenericPaginator {
         reactions.add(new PaginatorReaction("⬅️", (user, emote, paginator, message) -> {
             if (!user.getId().equals(userRequestedThis.getId())) return;
 
-            message.removeReaction(emote, user).queue();
+            message.removeReaction(Emoji.fromFormatted(emote), user).queue();
 
             // checks so we don't go to the 0th page
             if (paginator.getCurrentPage() - 1 >= 1){
@@ -156,7 +157,7 @@ public class GenericPaginator {
         reactions.add(new PaginatorReaction("➡️", ((user, emote, paginator, message) -> {
             if (!user.getId().equals(userRequestedThis.getId())) return;
 
-            message.removeReaction(emote, user).queue();
+            message.removeReaction(Emoji.fromFormatted(emote), user).queue();
 
             if (paginator.getCurrentPage() + 1 <= maxPage){
                 paginator.setCurrentPage(paginator.getCurrentPage() + 1);
@@ -168,7 +169,7 @@ public class GenericPaginator {
         reactions.add(new PaginatorReaction("⏩", ((user, emote, paginator, message) -> {
             if (!user.getId().equals(userRequestedThis.getId())) return;
 
-            message.removeReaction(emote, user).queue();
+            message.removeReaction(Emoji.fromFormatted(emote), user).queue();
 
             paginator.setCurrentPage(paginator.getMaxPage());
 

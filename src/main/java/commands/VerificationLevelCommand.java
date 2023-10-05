@@ -3,6 +3,9 @@ package commands;
 import io.opencensus.trace.Link;
 import net.dv8tion.jda.api.Permission;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.Category;
+import net.dv8tion.jda.api.entities.channel.middleman.GuildChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.requests.restaction.order.ChannelOrderAction;
 import utils.Args;
@@ -13,6 +16,7 @@ import utils.verificationLevel.VerificationLevelStuff;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.LinkedList;
 
 public class VerificationLevelCommand {
@@ -133,11 +137,9 @@ public class VerificationLevelCommand {
                             }
 
                             if (!listOfLockedChannels.contains(channel.getId())){
-                                channel.getPermissionContainer().putPermissionOverride(everyone)
-                                        .setDeny(Permission.VIEW_CHANNEL).queue();
+                                channel.getPermissionContainer().getManager().putPermissionOverride(everyone, null, EnumSet.of(Permission.VIEW_CHANNEL)).queue();
 
-                                channel.getPermissionContainer().putPermissionOverride(verificationRole)
-                                        .setAllow(Permission.VIEW_CHANNEL).queue();
+                                channel.getPermissionContainer().getManager().putPermissionOverride(verificationRole, EnumSet.of(Permission.VIEW_CHANNEL), null).queue();
                             }
 
                         }
@@ -149,11 +151,9 @@ public class VerificationLevelCommand {
                                 event.getGuild().addRoleToMember(member, verificationRole).queue();
                         }
 
-                        verificationCategory.getPermissionContainer().putPermissionOverride(everyone)
-                                        .setAllow(Permission.VIEW_CHANNEL).queue();
+                        verificationCategory.getPermissionContainer().getManager().putPermissionOverride(everyone, EnumSet.of(Permission.VIEW_CHANNEL), null).queue();
 
-                        verificationCategory.getPermissionContainer().putPermissionOverride(verificationRole)
-                                        .setDeny(Permission.VIEW_CHANNEL).queue();
+                        verificationCategory.getPermissionContainer().getManager().putPermissionOverride(verificationRole, null, EnumSet.of(Permission.VIEW_CHANNEL)).queue();
 
                         event.getChannel().sendMessageEmbeds(new Embed("Verification Level", "Successfully set verification level to " + level.getLevel() + "!", Color.GREEN).build()).queue();
 
@@ -170,8 +170,7 @@ public class VerificationLevelCommand {
 
                         for (GuildChannel channel : event.getGuild().getChannels()) {
                             if (!lockedChannels.contains(channel.getId())){
-                                channel.getPermissionContainer().putPermissionOverride(everyone)
-                                        .setAllow(Permission.VIEW_CHANNEL).queue();
+                                channel.getPermissionContainer().getManager().putPermissionOverride(everyone, EnumSet.of(Permission.VIEW_CHANNEL), null).queue();
                             }
                         }
 

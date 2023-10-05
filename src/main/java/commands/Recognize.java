@@ -11,6 +11,8 @@ import utils.Constants;
 import utils.Embed;
 import utils.Logger;
 import utils.stuffs.MusicRecognitionStuff;
+import utils.timeparsers.TimeStamp;
+import utils.timeparsers.YoutubeTimeParser;
 
 import java.awt.*;
 import java.io.IOException;
@@ -41,28 +43,13 @@ public class Recognize extends CommandManager {
         boolean canSeek = false;
         int realTime = 0;
 
-        if (url.contains("&t=")){
-            String timeToSkip = url.split("&t=")[1];
-            if (timeToSkip.contains("&")){
-                timeToSkip = timeToSkip.split("&")[0];
-            }
-            try{
-                realTime = Integer.parseInt(timeToSkip);
-                canSeek = true;
-            } catch (NumberFormatException e){
-                // event.getChannel().sendMessageEmbeds(new Embed("Error", "Could not parse timestamp!", Color.RED).build()).queue();
-            }
-        } else if (url.contains("?t=")){
-            String timeToSkip = url.split("t=")[1];
-            try{
-                realTime = Integer.parseInt(timeToSkip);
-                canSeek = true;
-            } catch (NumberFormatException e){
-                // event.getChannel().sendMessageEmbeds(new Embed("Error", "Could not parse timestamp!", Color.RED).build()).queue();
-            }
-        }
+        YoutubeTimeParser parser = new YoutubeTimeParser(url);
 
-        if (!canSeek || realTime == 0){
+        TimeStamp stamp = parser.parse();
+
+        realTime = stamp.getSeconds() + stamp.getMinutes() * 60 + stamp.getHours() * 60 * 60;
+
+        if (stamp.getSeconds() == -1){
             event.getChannel().sendMessageEmbeds(new Embed("Error", "Could not parse timestamp!", Color.RED).build()).queue();
             return;
         }
@@ -72,7 +59,11 @@ public class Recognize extends CommandManager {
 
         String videoFileSyntax = "data/" + event.getGuild().getId() + "_" + event.getMember().getId() + ".%(ext)s";
 
-        String ytDlpPath = "/usr/local/bin/yt-dlp";
+        // release
+         String ytDlpPath = "/usr/local/bin/yt-dlp";
+
+        // dev
+//        String ytDlpPath = "/usr/bin/yt-dlp";
 
         // gets the name of the file
         process = Constants.runProcess(ytDlpPath + " -f bestaudio --get-filename -o " + videoFileSyntax + " " + url);
@@ -105,9 +96,24 @@ public class Recognize extends CommandManager {
 
         logger.debug("Output: " + output + " | Error output: " + errOutput + " | Filename: " + fileName);
 
-        if (fileName == null || output.length() == 0 || (errOutput != null && errOutput.length() > 0)){
-            event.getChannel().sendMessageEmbeds(new Embed("Error", "Something failed while downloading the video! Error: " + errOutput, Color.RED).build()).queue();
+        if (fileName == null){
+            try{
+                event.getChannel().sendMessageEmbeds(new Embed("Error", "File not found after download!", Color.RED).build()).queue();
+            } catch (IllegalArgumentException noted){
+                event.getChannel().sendMessageEmbeds(new Embed("Error", "File not found after download!", Color.RED).build()).queue();
+                Constants.sendFile(event.getChannel(), errOutput, "error.txt");
+            }
+
             return;
+        }
+
+        if (output.length() == 0){
+            String msg = "No output has been detected! Download may have failed...";
+
+            event.getChannel().sendMessageEmbeds(new Embed("Warning", msg, Color.ORANGE).build()).queue();
+
+        } else if (errOutput != null && errOutput.length() > 0){
+            event.getChannel().sendMessageEmbeds(new Embed("Warning", "Error output is present:\n" + errOutput, Color.ORANGE).build()).queue();
         }
 
         fileName = fileName.strip();

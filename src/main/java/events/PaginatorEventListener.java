@@ -46,7 +46,7 @@ public class PaginatorEventListener extends ListenerAdapter {
             if (!paginator.getPaginatorMessage().getId().equals(event.getMessageId())) continue;
 
             for (PaginatorReaction reaction: paginator.getReactions()){
-                if (Objects.equals(reaction.getEmojiString(), event.getReactionEmote().getAsReactionCode())){
+                if (Objects.equals(reaction.getEmojiString(), event.getEmoji().getAsReactionCode())){
                     reaction.getLambda().execute(event.getUser(), reaction.getEmojiString(), paginator, paginator.getPaginatorMessage());
                 }
             }

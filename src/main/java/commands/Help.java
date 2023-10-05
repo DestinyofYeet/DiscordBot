@@ -23,8 +23,7 @@ public class Help extends CommandManager {
     };
 
     public static final String[] MUSIC_COMMANDS_RAW = {
-            "ClearQ", "Disconnect", "Join", "NowPlaying", "Pause", "PlayNext", "Queue", "Recognize", "Seek", "Skip",
-            "Shuffle", "Volume", "Search"
+            "Recognize"
     };
 
     public static final LinkedList<String> MODERATION_COMMANDS = new LinkedList<>(), MUSIC_COMMANDS = new LinkedList<>();
@@ -133,6 +132,10 @@ public class Help extends CommandManager {
             }
 
             musicPaginator.sortEntries();
+
+            musicPaginator.addEntry(new PaginatorEntry(""));
+
+            musicPaginator.addEntry(new PaginatorEntry("Most of the music commands have been moved to use slash commands."));
 
             musicPaginator.addReaction(new PaginatorReaction("\uD83D\uDD19", (member1, emote1, paginator1, message1) -> {
                 if (!member1.getId().equals(paginator1.getUserRequestedThis().getId())) return;

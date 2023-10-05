@@ -2,9 +2,10 @@ package events;
 
 import main.Main;
 import net.dv8tion.jda.api.Permission;
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.MessageEmbed;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.unions.MessageChannelUnion;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import org.json.JSONException;
@@ -19,6 +20,7 @@ import utils.verificationLevel.CaptchaVerification;
 import utils.verificationLevel.ReactionVerification;
 
 import java.awt.*;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -61,13 +63,13 @@ public class DeleteMessagesAfter60Seconds extends ListenerAdapter {
             }
             int count = new JSONObject(JsonStuff.getStringFromJson(Constants.getBlacklistedWarnsPath(), event.getGuild().getId())).getInt(event.getMember().getId());
             if (count >= 5){
-                TextChannel channel = event.getTextChannel();
-                channel.getManager().getChannel().putPermissionOverride(event.getMember()).setDeny(Permission.MESSAGE_SEND).queue();
-                channel.getManager().getChannel().putPermissionOverride(event.getMember()).setAllow(Permission.MESSAGE_SEND).queueAfter(10, TimeUnit.MINUTES);
+                TextChannel channel = event.getChannel().asTextChannel();
+                channel.getManager().getChannel().getManager().putPermissionOverride(event.getMember(), null, EnumSet.of(Permission.MESSAGE_SEND)).queue();
+                channel.getManager().getChannel().getManager().putPermissionOverride(event.getMember(), EnumSet.of(Permission.MESSAGE_SEND), null).queueAfter(10, TimeUnit.MINUTES);
                 event.getChannel().sendMessageEmbeds(new Embed("Restricted access", event.getMember().getAsMention() + " has been restricted access to this channel since he wrote too many blacklisted words! He will regain access to the channel in 10 Minutes!", Color.RED).build()).queue();
                 if (loggingChannel != null){
-                    loggingChannel.sendMessageEmbeds(new Embed("Restricted access", event.getMember().getAsMention() + " has been restricted access to the channel " + event.getTextChannel().getAsMention() + " since he wrote too many blacklisted words! He will regain access to the channel in 10 Minutes!", Color.BLACK).build()).queue();
-                    loggingChannel.sendMessageEmbeds(new Embed("Restricted access", event.getMember().getAsMention() + " now has access to " + event.getTextChannel().getAsMention() + " again!", Color.BLACK).build()).queueAfter(10, TimeUnit.MINUTES);
+                    loggingChannel.sendMessageEmbeds(new Embed("Restricted access", event.getMember().getAsMention() + " has been restricted access to the channel " + event.getChannel().getAsMention() + " since he wrote too many blacklisted words! He will regain access to the channel in 10 Minutes!", Color.BLACK).build()).queue();
+                    loggingChannel.sendMessageEmbeds(new Embed("Restricted access", event.getMember().getAsMention() + " now has access to " + event.getChannel().getAsMention() + " again!", Color.BLACK).build()).queueAfter(10, TimeUnit.MINUTES);
                 }
                 JSONObject data = new JSONObject(JsonStuff.getStringFromJson(Constants.getBlacklistedWarnsPath(), event.getGuild().getId()));
                 data.put(event.getMember().getId(), 0);

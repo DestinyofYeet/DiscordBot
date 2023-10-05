@@ -24,7 +24,11 @@ public class Config {
 
     private String apexLegendsKey;
 
+    private String yeetApiUsername;
+    private String yeetApiPassword;
+
     public Config(String filePath){
+
         this.filePath = filePath;
 
         String content = null;
@@ -54,6 +58,9 @@ public class Config {
         this.sqlPassword = this.content.getString("sql-password");
 
         this.apexLegendsKey = this.content.getString("apex-legends-key");
+
+        this.yeetApiUsername = this.content.getString("yeet-api-username");
+        this.yeetApiPassword = this.content.getString("yeet-api-password");
     }
 
     public String getFilePath() {
@@ -98,5 +105,13 @@ public class Config {
 
     public String getApexLegendsKey() {
         return apexLegendsKey;
+    }
+
+    public String getYeetApiUsername() {
+        return yeetApiUsername;
+    }
+
+    public String getYeetApiPassword() {
+        return yeetApiPassword;
     }
 }

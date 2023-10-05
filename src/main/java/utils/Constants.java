@@ -2,8 +2,15 @@ package utils;
 
 import main.Main;
 import net.dv8tion.jda.api.entities.*;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
+import net.dv8tion.jda.api.entities.emoji.Emoji;
+import net.dv8tion.jda.api.entities.emoji.RichCustomEmoji;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorResponseException;
+import net.dv8tion.jda.api.interactions.commands.OptionMapping;
 import net.dv8tion.jda.api.requests.RestAction;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.apache.commons.io.IOUtils;
 import utils.sql.SQLRequest;
 import utils.sql.RequestType;
@@ -25,6 +32,7 @@ import java.util.List;
 public class Constants {
 
     public static String APEX_LEGENDS_API_BASE = "https://api.mozambiquehe.re";
+    public static String UWUWHATSTHIS_API_BASE = "https://api.uwuwhatsthis.de";
 
     public static HashMap<String, String> getAliases() {
         // Aliases for commands, points to the file name
@@ -171,11 +179,11 @@ public class Constants {
         }
     }
 
-    public static Emote getEmoteById(Guild guild, String id) {
+    public static Emoji getEmojiById(Guild guild, String id) {
         // gets an emote by id
-        RestAction<ListedEmote> emoteData = guild.retrieveEmoteById(id);
+        RestAction<RichCustomEmoji> emojiData = guild.retrieveEmojiById(id);
         try {
-            return emoteData.complete();
+            return emojiData.complete();
         } catch (ErrorResponseException e) {
             return null;
         }
@@ -209,20 +217,20 @@ public class Constants {
         return channel;
     }
 
-    public static Emote getEmote(Guild guild, String input) {
-        // get an emote by id or by like the :hello: tag
-        Emote emote = null;
+    public static Emoji getEmoji(Guild guild, String input) {
+        // get an emoji by id or by like the :hello: tag
+        Emoji emoji = null;
         if (input.length() < 6) return null;
 
         try {
-            emote = Constants.getEmoteById(guild, input);
+            emoji = Constants.getEmojiById(guild, input);
         } catch (IllegalArgumentException ignored) {
             input = input.split(":")[2];
             input = input.replace(">", "");
-            emote = getEmoteById(guild, input);
+            emoji = getEmojiById(guild, input);
         }
 
-        return emote;
+        return emoji;
     }
 
     public static String getFileContent(String filePath) {
@@ -243,7 +251,7 @@ public class Constants {
             fw.write(content);
             fw.flush();
             fw.close();
-            channel.sendFile(file, filename).queue();
+            channel.sendFiles(FileUpload.fromData(file, filename)).queue();
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -369,5 +377,29 @@ public class Constants {
 
     public static boolean intToBool(int number){
         return number > 0;
+    }
+
+    public static String getSlashCommandFieldIfItExistsString(SlashCommandInteractionEvent event, String field){
+        OptionMapping inputField = event.getOption(field);
+
+        if (inputField == null) return null;
+
+        return inputField.getAsString();
+    }
+
+    public static int getSlashCommandFieldIfItExistsInt(SlashCommandInteractionEvent event, String field){
+        OptionMapping inputField = event.getOption(field);
+
+        if (inputField == null) return -1;
+
+        return inputField.getAsInt();
+    }
+
+    public static void deferReplyIfNotAlready(SlashCommandInteractionEvent event){
+        deferReplyIfNotAlready(event, false);
+    }
+
+    public static void deferReplyIfNotAlready(SlashCommandInteractionEvent event, boolean ephemeral){
+        if (!event.isAcknowledged()) event.deferReply().queue();
     }
 }

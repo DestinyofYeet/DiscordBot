@@ -1,4 +1,4 @@
-package commands;
+package slash_commands;
 
 import audio.PlayerManager;
 import com.google.api.services.youtube.model.SearchListResponse;
@@ -6,14 +6,16 @@ import com.google.api.services.youtube.model.SearchResult;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import main.CommandManager;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
-import utils.Args;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
+import net.dv8tion.jda.api.interactions.commands.OptionType;
+import net.dv8tion.jda.api.interactions.commands.build.Commands;
+import net.dv8tion.jda.api.interactions.commands.build.SlashCommandData;
 import utils.Constants;
 import utils.Embed;
+import utils.slashpaginator.SlashGenericPaginator;
+import utils.slashpaginator.SlashPaginatorEntry;
+import utils.slashpaginator.SlashPaginatorReaction;
 import utils.stuffs.YoutubeStuff;
-import utils.paginator.GenericPaginator;
-import utils.paginator.PaginatorEntry;
-import utils.paginator.PaginatorReaction;
 
 import java.awt.*;
 import java.io.IOException;
@@ -23,39 +25,40 @@ import java.util.List;
 
 public class Search extends CommandManager {
 
-    public static final String commandName = "Search",
-            syntax = "search (link / searchterm)",
-            description = "Lists 5 search results where you can select one for the bot to play!";
+    public final static SlashCommandData command = Commands.slash("search", "Lists 5 search results where you can select one for the bot to play!")
+            .addOption(OptionType.STRING, "query", "The query to search for");
 
-    public void execute(MessageReceivedEvent event, Args args){
+    public void execute(SlashCommandInteractionEvent event){
         Member bot = Constants.getBotUserInGuild(event.getGuild());
 
         boolean joined = false;
 
+        if (!event.isAcknowledged()) event.deferReply().queue();
+
+        String searchTerm = Constants.getSlashCommandFieldIfItExistsString(event, "query");
+
         if (bot.getVoiceState().getChannel() == null){
             if (event.getMember().getVoiceState().getChannel() == null){
-                event.getChannel().sendMessageEmbeds(new Embed("Error", "You need to be in a voice channel to run this command!", Color.RED).build()).queue();
+                event.getHook().editOriginalEmbeds(new Embed("Error", "You need to be in a voice channel to run this command!", Color.RED).build()).queue();
                 return;
             }
 
-            joined = new Join().execute(event, args);
+            joined = new Join().execute(event);
         }
 
         if (!joined){
             if (!Constants.sameChannelAsBot(event.getMember())){
-                event.getChannel().sendMessageEmbeds(new Embed("Error", "You are not in the same channel as me!", Color.RED).build()).queue();
+                event.getHook().editOriginalEmbeds(new Embed("Error", "You are not in the same channel as me!", Color.RED).build()).queue();
                 return;
             }
         }
 
 
 
-        if (args.isEmpty()){
-            event.getChannel().sendMessageEmbeds(new Embed("Error", "You need to provide a search term!", Color.RED).build()).queue();
+        if (searchTerm == null){
+            event.getHook().editOriginalEmbeds(new Embed("Error", "You need to provide a search term!", Color.RED).build()).queue();
             return;
         }
-
-        String searchTerm = String.join(" ", args.getArgs());
 
         SearchListResponse response = null;
 
@@ -63,12 +66,12 @@ public class Search extends CommandManager {
             response = YoutubeStuff.doStuff(searchTerm);
         } catch (GeneralSecurityException | IOException e) {
             e.printStackTrace();
-            event.getChannel().sendMessageEmbeds(new Embed("Error", "Play command failed because: " + e.getMessage(), Color.RED).build()).queue();
+            event.getHook().editOriginalEmbeds(new Embed("Error", "Play command failed because: " + e.getMessage(), Color.RED).build()).queue();
             return;
         }
 
         if (response == null){
-            event.getChannel().sendMessageEmbeds(new Embed("Error", "Api request failed!", Color.RED).build()).queue();
+            event.getHook().editOriginalEmbeds(new Embed("Error", "Api request failed!", Color.RED).build()).queue();
             return;
         }
 
@@ -85,7 +88,7 @@ public class Search extends CommandManager {
                 trackList.add(manager.getTrackFromUrl("https://youtube.com/watch?v=" + result.getId().getVideoId().trim()));
         }
 
-        GenericPaginator paginator = new GenericPaginator("Search results for \"" + searchTerm + "\"");
+        SlashGenericPaginator paginator = new SlashGenericPaginator("Search results for \"" + searchTerm + "\"");
 
         for (AudioTrack track: trackList){
             if (track == null) continue;
@@ -105,7 +108,7 @@ public class Search extends CommandManager {
             }
 
 
-            PaginatorEntry entry = new PaginatorEntry("**Title**: [" + track.getInfo().title + "](" + track.getInfo().uri +  "),\n" +
+            SlashPaginatorEntry entry = new SlashPaginatorEntry("**Title**: [" + track.getInfo().title + "](" + track.getInfo().uri +  "),\n" +
                     "**Author**: " + track.getInfo().author + ",\n" +
                     "**Duration**: " + (hours > 0 ? hours + " Hours, " : "") + (minutes > 0 ? minutes + " Minutes, ": "") + songSeconds + " Seconds\n\n");
 
@@ -114,8 +117,8 @@ public class Search extends CommandManager {
 
         paginator.setMaxElementsPerPage(5);
         paginator.setColor(Color.GREEN);
-        paginator.setUserRequestedThis(event.getAuthor());
-        paginator.setChannel(event.getChannel());
+        paginator.setUserRequestedThis(event.getUser());
+        paginator.setEvent(event);
         paginator.setUseDefaultEmotes(false);
 
         List<AudioTrack> newTrackList = new LinkedList<>(trackList);
@@ -129,25 +132,25 @@ public class Search extends CommandManager {
             int j = i;
 
 
-            paginator.addReaction(new PaginatorReaction((j + 1) + "⃣", ((user, emote, paginator1, message) -> {
+            paginator.addReaction(new SlashPaginatorReaction((j + 1) + "⃣", ((user, emote, paginator1, message) -> {
                 queueSong(j + 1, event, newTrackList, paginator);
             })));
         }
 
-        paginator.addReaction(new PaginatorReaction("❌", (((user, emote, paginator1, message) -> {
+        paginator.addReaction(new SlashPaginatorReaction("❌", (((user, emote, paginator1, message) -> {
             paginator1.close();
         }))));
 
         paginator.send();
     }
 
-    private void queueSong(int searchIndex, MessageReceivedEvent event, List<AudioTrack> trackList, GenericPaginator paginator){
+    private void queueSong(int searchIndex, SlashCommandInteractionEvent event, List<AudioTrack> trackList, SlashGenericPaginator paginator){
         PlayerManager manager = PlayerManager.getInstance();
 
         AudioTrack songToQueue = trackList.get(searchIndex - 1);
 
         manager.play(manager.getGuildMusicManager(event.getGuild()), songToQueue, false);
-        event.getChannel().sendMessageEmbeds(new Embed("Search", "Song Queued!", Color.GREEN).build()).queue();
+        event.getHook().editOriginalEmbeds(new Embed("Search", "Song Queued!", Color.GREEN).build()).queue();
 
         paginator.close();
     }

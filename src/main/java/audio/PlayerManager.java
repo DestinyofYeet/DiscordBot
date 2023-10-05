@@ -8,7 +8,8 @@ import com.sedmelluq.discord.lavaplayer.tools.FriendlyException;
 import com.sedmelluq.discord.lavaplayer.track.AudioPlaylist;
 import com.sedmelluq.discord.lavaplayer.track.AudioTrack;
 import net.dv8tion.jda.api.entities.Guild;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
+import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import utils.Embed;
 
 import java.awt.*;
@@ -44,17 +45,17 @@ public class PlayerManager {
         return musicManager;
     }
 
-    public void loadAndPlay(TextChannel channel, String trackURL){
-        loadAndPlay(channel, trackURL, false);
+    public void loadAndPlay(SlashCommandInteractionEvent event, String trackURL){
+        loadAndPlay(event, trackURL, false);
     }
 
-    public void loadAndPlay(TextChannel channel, String trackURL, boolean insertTop){
-        GuildMusicManager musicManager = getGuildMusicManager(channel.getGuild());
+    public void loadAndPlay(SlashCommandInteractionEvent event, String trackURL, boolean insertTop){
+        GuildMusicManager musicManager = getGuildMusicManager(event.getGuild());
 
         playerManager.loadItemOrdered(musicManager, trackURL, new AudioLoadResultHandler() {
             @Override
             public void trackLoaded(AudioTrack audioTrack) {
-                channel.sendMessageEmbeds(new Embed("Queued!", "Added " + audioTrack.getInfo().title + " to queue!", Color.GREEN).build()).queue();
+                event.getHook().editOriginalEmbeds(new Embed("Queued!", "Added " + audioTrack.getInfo().title + " to queue!", Color.GREEN).build()).queue();
 
                 play(musicManager, audioTrack, insertTop);
             }
@@ -67,23 +68,23 @@ public class PlayerManager {
                     for (AudioTrack audioTrack: audioPlaylist.getTracks()){
                         play(musicManager, audioTrack, insertTop);
                     }
-                    channel.sendMessageEmbeds(new Embed("Play", "Playlist \"" + audioPlaylist.getName() + "\" loaded with " + audioPlaylist.getTracks().size() + " entries!", Color.GREEN).build()).queue();
+                    event.getHook().editOriginalEmbeds(new Embed("Play", "Playlist \"" + audioPlaylist.getName() + "\" loaded with " + audioPlaylist.getTracks().size() + " entries!", Color.GREEN).build()).queue();
                     return;
                 }
 
-                channel.sendMessageEmbeds(new Embed("Queued!", "Added \"" + firstTrack.getInfo().title + "\" to queue!", Color.GREEN).build()).queue();
+                event.getHook().editOriginalEmbeds(new Embed("Queued!", "Added \"" + firstTrack.getInfo().title + "\" to queue!", Color.GREEN).build()).queue();
 
                 play(musicManager, firstTrack, insertTop);
             }
 
             @Override
             public void noMatches() {
-                channel.sendMessageEmbeds(new Embed("Error", "Nothing found by searching for " + trackURL, Color.RED).build()).queue();
+                event.getHook().editOriginalEmbeds(new Embed("Error", "Nothing found by searching for " + trackURL, Color.RED).build()).queue();
             }
 
             @Override
             public void loadFailed(FriendlyException e) {
-                channel.sendMessageEmbeds(new Embed("Error", "Could not play: " + e.getMessage(), Color.RED).build()).queue();
+                event.getHook().editOriginalEmbeds(new Embed("Error", "Could not play: " + e.getMessage(), Color.RED).build()).queue();
             }
         });
     }

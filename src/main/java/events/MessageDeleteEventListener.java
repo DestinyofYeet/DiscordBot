@@ -1,8 +1,8 @@
 package events;
 
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.entities.Member;
-import net.dv8tion.jda.api.entities.TextChannel;
+import net.dv8tion.jda.api.entities.channel.concrete.TextChannel;
 import net.dv8tion.jda.api.events.message.MessageDeleteEvent;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
 import utils.*;
@@ -20,7 +20,7 @@ public class MessageDeleteEventListener extends ListenerAdapter {
     @Override
     public void onMessageDelete(MessageDeleteEvent event){
         if (!(event.getChannelType().equals(ChannelType.TEXT))) return;
-        TextChannel actionChannel = event.getTextChannel();
+        TextChannel actionChannel = event.getChannel().asTextChannel();
         TextChannel loggingChannel = Constants.getLoggingChannel(event.getGuild());
         if (loggingChannel == null) return;
         if (actionChannel.getIdLong() == (Constants.getLoggingChannel(event.getGuild()).getIdLong())) return;

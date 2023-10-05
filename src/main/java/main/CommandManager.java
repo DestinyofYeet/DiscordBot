@@ -1,10 +1,11 @@
 package main;
 
 
-import net.dv8tion.jda.api.entities.ChannelType;
+import net.dv8tion.jda.api.entities.channel.ChannelType;
 import net.dv8tion.jda.api.events.message.MessageReceivedEvent;
 import net.dv8tion.jda.api.exceptions.HierarchyException;
 import net.dv8tion.jda.api.hooks.ListenerAdapter;
+import net.dv8tion.jda.api.utils.FileUpload;
 import org.reflections.Reflections;
 import utils.*;
 import utils.stuffs.PrefixStuff;
@@ -85,7 +86,7 @@ public class CommandManager extends ListenerAdapter {
 
                         event.getChannel().sendMessageEmbeds(new Embed("Fatal Error", "Something failed: " + e.getMessage(), Color.RED).build()).queue();
 
-                        event.getChannel().sendFile(new File(filename), "Traceback.txt").queue();
+                        event.getChannel().sendFiles(FileUpload.fromData(new File(filename), "Traceback.txt")).queue();
 
                         try {
                             Files.deleteIfExists(Path.of(filename));
@@ -112,7 +113,7 @@ public class CommandManager extends ListenerAdapter {
 
                 event.getChannel().sendMessageEmbeds(new Embed("Fatal Error", "Something failed: " + e.getMessage(), Color.RED).build()).queue();
 
-                event.getChannel().sendFile(new File(filename), "Traceback.txt").queue();
+                event.getChannel().sendFiles(FileUpload.fromData(new File(filename), "Traceback.txt")).queue();
 
                 Files.deleteIfExists(Path.of(filename));
             }

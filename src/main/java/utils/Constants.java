@@ -181,6 +181,12 @@ public class Constants {
 
     public static Emoji getEmojiById(Guild guild, String id) {
         // gets an emote by id
+        Emoji emoji = Emoji.fromUnicode(id);
+
+        if (true){
+            return emoji;
+        }
+
         RestAction<RichCustomEmoji> emojiData = guild.retrieveEmojiById(id);
         try {
             return emojiData.complete();
@@ -220,10 +226,10 @@ public class Constants {
     public static Emoji getEmoji(Guild guild, String input) {
         // get an emoji by id or by like the :hello: tag
         Emoji emoji = null;
-        if (input.length() < 6) return null;
+//        if (input.length() < 6) return null;
 
         try {
-            emoji = Constants.getEmojiById(guild, input);
+            emoji = getEmojiById(guild, input);
         } catch (IllegalArgumentException ignored) {
             input = input.split(":")[2];
             input = input.replace(">", "");

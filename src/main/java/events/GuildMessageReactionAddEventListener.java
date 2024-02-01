@@ -15,12 +15,14 @@ public class GuildMessageReactionAddEventListener extends ListenerAdapter {
     public void onMessageReactionAdd(MessageReactionAddEvent event){
         if (!event.isFromGuild()) return;
 
+        if (event.getUserId().equals(event.getJDA().getSelfUser().getId())) return;
+
         String reactContent = JsonStuff.getStringFromJson(Constants.getReactionPath(), event.getGuild().getId());
         if (reactContent == null) return;
         String messageId = event.getMessageId();
         String emojiId;
         try {
-            emojiId = event.getEmoji().asCustom().getId();
+            emojiId = event.getEmoji().getAsReactionCode();
         } catch (IllegalStateException ignored){
             return;
         }

@@ -41,7 +41,7 @@ public class SlashPaginatorEventListener extends ListenerAdapter {
 
         if (event.getUser().getId().equals(event.getJDA().getSelfUser().getId())) return;
 
-        for (SlashGenericPaginator paginator : paginators) {
+        for (SlashGenericPaginator paginator : (LinkedList<SlashGenericPaginator>) paginators.clone()) {
             if (!paginator.getEvent().getHook().retrieveOriginal().complete().getId().equals(event.getMessageId()))
                 continue;
 

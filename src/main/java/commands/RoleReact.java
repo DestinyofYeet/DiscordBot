@@ -105,7 +105,7 @@ public class RoleReact extends CommandManager {
         if (fileContent != null) {
             JSONObject outerJson = new JSONObject(fileContent);
             JSONObject innerJson = new JSONObject();
-            innerJson.put(emoji.getAsReactionCode(), role.getId());
+            innerJson.put(emoji.getAsReactionCode().replace("<", "").replace(">", "").replaceFirst(":", ""), role.getId());
             JSONObject innerJsonFromOuterJson = null;
             try {
                 innerJsonFromOuterJson = new JSONObject(outerJson.getString(messageId));
@@ -124,14 +124,13 @@ public class RoleReact extends CommandManager {
         } else {
             JSONObject innerJson = new JSONObject();
             JSONObject outerJson = new JSONObject();
-            innerJson.put(emoji.getAsReactionCode(), role.getId());
+            innerJson.put(emoji.getAsReactionCode().replace("<", "").replace(">", "").replaceFirst(":", ""), role.getId());
             outerJson.put(messageId, innerJson.toString());
 
             JsonStuff.writeToJsonFile(Constants.getReactionPath(), event.getGuild().getId(), outerJson.toString());
         }
 
-
-        message.addReaction(emoji).queue();
+        message.addReaction(Emoji.fromFormatted(emoji.getFormatted())).queue();
         event.getChannel().sendMessageEmbeds(new Embed("Reacted", "Reaction added!\n\n[Click to jump to url](" + message.getJumpUrl() + ")", Color.GREEN).build()).queue();
     }
 }

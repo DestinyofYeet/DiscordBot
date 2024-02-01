@@ -4,12 +4,12 @@ import events.PaginatorEventListener;
 import events.SlashPaginatorEventListener;
 import net.dv8tion.jda.api.entities.Message;
 import net.dv8tion.jda.api.entities.User;
-import net.dv8tion.jda.api.entities.channel.middleman.MessageChannel;
 import net.dv8tion.jda.api.entities.emoji.Emoji;
 import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEvent;
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import utils.Embed;
+import utils.paginator.PaginatorEntry;
 
 import java.awt.*;
 import java.util.Collections;
@@ -97,6 +97,10 @@ public class SlashGenericPaginator {
         }
 
         embed = new Embed(title + " | Page " + currentPage + "/" + maxPage, builder.toString(), color);
+
+        if (maxElementsPerPage == 1){
+            embed.setImage(entries.get(currentPage - 1).getCoverUrl());
+        }
     }
 
     public void send(){
@@ -303,5 +307,13 @@ public class SlashGenericPaginator {
 
     public void setMaxMinutesUntilDeletion(int maxMinutesUntilDeletion) {
         this.maxMinutesUntilDeletion = maxMinutesUntilDeletion;
+    }
+
+    public void setEmbed(Embed embed) {
+        this.embed = embed;
+    }
+
+    public void clearEntries(){
+        this.entries = new LinkedList<>();
     }
 }

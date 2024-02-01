@@ -60,10 +60,10 @@ public class Recognize extends CommandManager {
         String videoFileSyntax = "data/" + event.getGuild().getId() + "_" + event.getMember().getId() + ".%(ext)s";
 
         // release
-         String ytDlpPath = "/usr/local/bin/yt-dlp";
+//         String ytDlpPath = "/usr/local/bin/yt-dlp";
 
         // dev
-//        String ytDlpPath = "/usr/bin/yt-dlp";
+        String ytDlpPath = "/usr/bin/yt-dlp";
 
         // gets the name of the file
         process = Constants.runProcess(ytDlpPath + " -f bestaudio --get-filename -o " + videoFileSyntax + " " + url);
@@ -159,6 +159,8 @@ public class Recognize extends CommandManager {
         String youtubeUrl = "";
         String artistName = "";
 
+        System.out.println(sections);
+
         for (Object section : sections){
             if (!(section instanceof JSONObject jsonSection))
                 continue;
@@ -187,7 +189,8 @@ public class Recognize extends CommandManager {
             }
         }
 
-        event.getChannel().sendMessageEmbeds(new Embed("Music Recognition", "[" + songName + " by " + artistName + "](" + youtubeUrl + ")", Color.GREEN).build()).queue();
+        event.getChannel().sendMessageEmbeds(new Embed("Music Recognition", "[" + songName + " by " + artistName + "](" + youtubeUrl + ")\n\nLink: " + youtubeUrl, Color.GREEN)
+                .build()).queue();
 
         if (!lyrics.isEmpty()){
             Constants.sendFile(event.getChannel(), lyrics.toString(), "lyrics.txt");

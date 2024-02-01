@@ -14,11 +14,10 @@ public class GuildMessageReactionRemoveEventListener extends ListenerAdapter {
     @Override
     public void onMessageReactionRemove(MessageReactionRemoveEvent event){
         if (!event.isFromGuild()) return;
-        if (event.getMember() == null) return;
-        if (event.getMember().getId().equals(event.getJDA().getSelfUser().getId())) return;
+
+        if (event.getUserId().equals(event.getJDA().getSelfUser().getId())) return;
 
         String reactContent = JsonStuff.getStringFromJson(Constants.getReactionPath(), event.getGuild().getId());
-
 
         if (reactContent == null) return;
         String messageId = event.getMessageId();
@@ -29,7 +28,7 @@ public class GuildMessageReactionRemoveEventListener extends ListenerAdapter {
         if (innerJsonString == null) return;
 
         JSONObject innerJson = new JSONObject(innerJsonString);
-        String emojiId = event.getEmoji().asCustom().getId();
+        String emojiId = event.getEmoji().getAsReactionCode();
         String roleId = innerJson.getString(emojiId);
         if (roleId == null) return;
 

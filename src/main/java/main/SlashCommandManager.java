@@ -41,6 +41,7 @@ public class SlashCommandManager extends ListenerAdapter {
             add("Volume");
             add("ClearQ");
             add("Shuffle");
+            add("DownloadMusic");
         }};
 
         buildMap();

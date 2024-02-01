@@ -287,4 +287,8 @@ public class GenericPaginator {
     public void setMaxMinutesUntilDeletion(int maxMinutesUntilDeletion) {
         this.maxMinutesUntilDeletion = maxMinutesUntilDeletion;
     }
+
+    public void setEmbed(Embed embed) {
+        this.embed = embed;
+    }
 }

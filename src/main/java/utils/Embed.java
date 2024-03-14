@@ -69,6 +69,10 @@ public class Embed {
         }
     }
 
+    public EmbedBuilder getBuilder(){
+        return this.builder;
+    }
+
     public Embed addField(String title, String message){
         return addField(title,message, false);
     }

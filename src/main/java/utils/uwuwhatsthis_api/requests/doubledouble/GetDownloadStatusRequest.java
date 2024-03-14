@@ -36,6 +36,13 @@ public class GetDownloadStatusRequest extends BaseUwuwhatsthisApiRequest {
             return;
         }
 
+        if (response.getJsonBody().has("error")){
+            error = response.getJsonBody().getString("error");
+            logger.error("Response failed: " + error);
+            isSuccessful = false;
+            return;
+        }
+
         this.response = response.getJsonBody();
         isSuccessful = true;
     }
@@ -49,7 +56,7 @@ public class GetDownloadStatusRequest extends BaseUwuwhatsthisApiRequest {
     }
 
     public String getStatus(){
-        // System.out.println(this.response);
+        logger.info(this.response.toString());
         return this.response.getString("status");
     }
 }

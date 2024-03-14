@@ -43,7 +43,7 @@ public class SQLRequestManager {
         this.queue.add(SQLRequest);
     }
 
-    public void queue(SQLRequest SQLRequest){
+    public void queue(SQLRequest sqlRequest){
         if (!running) return;
 
         if (!pool.isConnected()){
@@ -51,17 +51,17 @@ public class SQLRequestManager {
             return;
         }
 
-        switch (SQLRequest.getType()){
+        switch (sqlRequest.getType()){
             case EXECUTE -> {
-                addRequest(SQLRequest);
+                addRequest(sqlRequest);
             }
 
             case RESULT -> {
-                synchronized (SQLRequest.getLock()){
-                    addRequest(SQLRequest);
+                synchronized (sqlRequest.getLock()){
+                    addRequest(sqlRequest);
 
                     try {
-                        SQLRequest.getLock().wait();
+                        sqlRequest.getLock().wait();
                     } catch (InterruptedException e) {
                         e.printStackTrace();
                     }
@@ -105,9 +105,9 @@ public class SQLRequestManager {
                 continue;
             }
 
-            SQLRequest SQLRequest = this.queue.poll();
+            SQLRequest sqlRequest = this.queue.poll();
 
-            synchronized (SQLRequest.getLock()){
+            synchronized (sqlRequest.getLock()){
                 Connection connection = pool.getConnection();
 
                 if (connection == null) {
@@ -130,13 +130,13 @@ public class SQLRequestManager {
                 Map<String, String> result;
 
                 try {
-                    statement = connection.prepareStatement(SQLRequest.getSql());
+                    statement = connection.prepareStatement(sqlRequest.getSql());
 
-                    for (int i = 1; i <= SQLRequest.getData().size(); i++) {
-                        statement.setString(i, SQLRequest.getData().get(i - 1));
+                    for (int i = 1; i <= sqlRequest.getData().size(); i++) {
+                        statement.setString(i, sqlRequest.getData().get(i - 1));
                     }
 
-                    if (SQLRequest.getType() == RequestType.EXECUTE)
+                    if (sqlRequest.getType() == RequestType.EXECUTE)
                         statement.execute();
 
                     else{
@@ -154,17 +154,17 @@ public class SQLRequestManager {
 
                         rs.close();
 
-                        SQLRequest.setResult(result);
+                        sqlRequest.setResult(result);
                     }
 
                     connection.close();
 
                 } catch (SQLException e) {
-                    logger.error("Failed to create statement! SQL: " + SQLRequest.getSql() + " | Data: " + SQLRequest.getData().toString());
+                    logger.error("Failed to create statement! SQL: " + sqlRequest.getSql() + " | Data: " + sqlRequest.getData().toString());
                     e.printStackTrace();
 
                 } finally {
-                    SQLRequest.getLock().notify();
+                    sqlRequest.getLock().notify();
                 }
             }
 

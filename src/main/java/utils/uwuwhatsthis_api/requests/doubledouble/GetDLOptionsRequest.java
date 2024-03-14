@@ -33,7 +33,15 @@ public class GetDLOptionsRequest extends BaseUwuwhatsthisApiRequest {
     public void onResponse(ResponseWrapper response){
         if (!response.isSuccessful()){
             logger.error("Response is not successful! Code: " + response.getCode() + " | Message: " + response.getReason());
-            error = response.getBody();
+            this.error = response.getBody();
+            isSuccessful = false;
+            return;
+        }
+        System.out.println(response.getJsonBody().toString());
+
+        if (response.getJsonBody().has("error")){
+            this.error = response.getJsonBody().getString("error");
+            logger.error("Response failed: " + error);
             isSuccessful = false;
             return;
         }

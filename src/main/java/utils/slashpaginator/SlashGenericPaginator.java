@@ -9,7 +9,7 @@ import net.dv8tion.jda.api.events.interaction.command.SlashCommandInteractionEve
 import net.dv8tion.jda.api.exceptions.ErrorHandler;
 import net.dv8tion.jda.api.requests.ErrorResponse;
 import utils.Embed;
-import utils.paginator.PaginatorEntry;
+import utils.Logger;
 
 import java.awt.*;
 import java.util.Collections;
@@ -18,7 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 public class SlashGenericPaginator {
 
-    private String title;
+    private String title, closedMessage, closedTitle;
 
     private int maxElementsPerPage, currentPage, maxPage, maxMinutesUntilDeletion;
 
@@ -41,6 +41,8 @@ public class SlashGenericPaginator {
 
     private boolean messageIsInitialed;
 
+    private final Logger logger = new Logger("SlashGenericPaginator");;
+
     public SlashGenericPaginator(String title){
         this();
         this.title = title;
@@ -56,6 +58,9 @@ public class SlashGenericPaginator {
         paginatorMessage = null;
         embed = null;
         userRequestedThis = null;
+
+        closedMessage = "This window is closed.";
+        closedTitle = "Closed";
 
         color = Color.WHITE;
 
@@ -131,7 +136,7 @@ public class SlashGenericPaginator {
     public void close(){
         PaginatorEventListener.getInstance().removeMessageId(event.getHook().retrieveOriginal().complete().getId());
 
-        embed = new Embed("Closed", "This window is closed.", color);
+        embed = new Embed(closedTitle, closedMessage, color);
 
         event.getHook().editOriginalEmbeds(embed.build()).queue();
 //        event.getHook().deleteOriginal().queueAfter(60, TimeUnit.SECONDS);
@@ -254,6 +259,9 @@ public class SlashGenericPaginator {
     }
 
     public Message getPaginatorMessage() {
+        if (paginatorMessage == null){
+            paginatorMessage = this.event.getHook().retrieveOriginal().complete();
+        }
         return paginatorMessage;
     }
 
@@ -315,5 +323,21 @@ public class SlashGenericPaginator {
 
     public void clearEntries(){
         this.entries = new LinkedList<>();
+    }
+
+    public String getClosedMessage() {
+        return closedMessage;
+    }
+
+    public void setClosedMessage(String closedMessage) {
+        this.closedMessage = closedMessage;
+    }
+
+    public String getClosedTitle() {
+        return closedTitle;
+    }
+
+    public void setClosedTitle(String closedTitle) {
+        this.closedTitle = closedTitle;
     }
 }

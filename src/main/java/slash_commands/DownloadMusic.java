@@ -180,10 +180,35 @@ public class DownloadMusic {
 
             if (!dlOptionsRequest.isSuccessful()) {
                 if (Objects.equals(dlOptionsRequest.getError(), "Failed to download options: No entries could be found! (Site down?)")){
-                    logger.info("Failed to find music, downloading using initial spotify link!");
-                    event.getHook().editOriginalEmbeds(new Embed("Error", "Failed to find download links. Downloading from spotify!", Color.ORANGE).build()).queue();
-                    DownloadMusicRequest spotifyBackupDownloadMusic = new DownloadMusicRequest(selectedResult.getLink(), "spotify");
-                    do_status_paginator(spotifyBackupDownloadMusic, event);
+                    logger.info("Failed to find music, asking if we should use the initial spotify link!");
+                    SlashGenericPaginator askingPaginator = new SlashGenericPaginator("Failed to find download links!");
+                    askingPaginator.setEvent(event);
+                    askingPaginator.setMaxElementsPerPage(1);
+                    askingPaginator.setUserRequestedThis(event.getUser());
+                    askingPaginator.setUseDefaultEmotes(false);
+                    askingPaginator.setColor(Color.ORANGE);
+
+                    askingPaginator.addEntry(new SlashPaginatorEntry(
+                            "Should spotify be used to download the song?"
+                    ));
+
+                    askingPaginator.addReaction(new SlashPaginatorReaction(
+                            "✅", (user1, emote1, paginator2, message1) -> {
+                        paginator2.clearReactions();
+                        paginator2.setClosedMessage("Downloading using Spotfiy!");
+                        paginator2.setClosedTitle("Downloading!");
+                        paginator2.close();
+                        DownloadMusicRequest spotifyBackupDownloadMusic = new DownloadMusicRequest(selectedResult.getLink(), "spotify");
+                        do_status_paginator(spotifyBackupDownloadMusic, event);
+                    }));
+
+                    askingPaginator.addReaction(new SlashPaginatorReaction(
+                            "❌", ((user1, emote1, paginator2, message1) -> {
+                                paginator2.setClosedMessage("Aborted");
+                                paginator2.clearReactions();
+                                paginator2.close();
+                    })));
+
                     return;
 
                 }
